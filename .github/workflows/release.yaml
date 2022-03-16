@@ -1,7 +1,7 @@
 name: Release Triggered Workflow
 
 on: 
-  release:
+  release
 
 # Ensure only the most recent workflow runs.
 concurrency:

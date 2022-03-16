@@ -10,13 +10,19 @@ jobs:
     name: Print github context infos to get Tag infos
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.cache.outputs.version }}
+      VERSION: ${{ steps.cache.outputs.VERSION }}
+      BASE: ${{ steps.cache.outputs.BASE}}
     steps:
       - name: Echo infos
         run: echo '${{toJSON(github)}}'
       - name: extract version 
         id: cache
-        run: echo ::set-output\ name=version::$(grep -oP "\d+.\d+.\d+rc\d+" <<< "${{github.ref}}")
+        run: |
+          echo ::set-output\ name=VERSION::$(grep -oP "\d+.\d+.\d+rc\d+" <<< "${{github.ref}}")
+          raw=$(git branch -r --contains ${{ github.ref }})
+          branch=${raw/origin\/}
+          echo ::set-output\ name=BASE::$branch
+      - run: echo ${{ steps.cache.outputs.BASE }}
 
   bump_version:
     name: Bump Version Number
@@ -28,7 +34,7 @@ jobs:
 
       - name: Prepare package and set version
         run: |
-          echo ${{ needs.taginfos.outputs.UBUNTU_VERSION }} > version.txt
+          echo ${{ needs.taginfos.outputs.VERSION }} > version.txt
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
@@ -37,5 +43,5 @@ jobs:
           title: Update Version number
           body: Update Version number to match specified in PR Title
           branch: update-version
-          base: ${{ github.head_ref }}
+          base: ${{ needs.taginfos.outputs.BASE }}
     

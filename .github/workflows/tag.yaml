@@ -9,9 +9,33 @@ jobs:
   taginfos:
     name: Print github context infos to get Tag infos
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.cache.outputs.version }}
     steps:
       - name: Echo infos
         run: echo '${{toJSON(github)}}'
       - name: extract version 
-        run: echo $(grep -oP "\d+.\d+.\d+rc\d+" <<< "${{github.ref}}")
+        id: cache
+        run: echo ::set-output\ name=version::$(grep -oP "\d+.\d+.\d+rc\d+" <<< "${{github.ref}}")
+
+  bump_version:
+    name: Bump Version Number
+    needs: taginfos
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Prepare package and set version
+        run: |
+          echo ${{ needs.taginfos.outputs.UBUNTU_VERSION }} > version.txt
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: Update Version number to match specified 
+          title: Update Version number
+          body: Update Version number to match specified in PR Title
+          branch: update-version
+          base: ${{ github.head_ref }}
     

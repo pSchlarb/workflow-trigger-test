@@ -2,7 +2,7 @@ name: Release Triggered Workflow
 
 on: 
   release:
-    types: [unpublished]
+    types: [unpublished, published]
 
 # Ensure only the most recent workflow runs.
 concurrency:

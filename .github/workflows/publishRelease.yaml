@@ -3,12 +3,7 @@ name: Triggered by Version Bump merged
 #disable all tags and enable all brannches and only version file
 on:
   push:
-    tags-ignore:
-      - '**'
-    branches:
-      - '**'
     paths:
-      - '!**'
       - version.txt
 
 

@@ -1,0 +1,18 @@
+name: Triggered by Version Bump Release PR
+
+on:
+  pull_request:
+    paths:
+      - '!**'
+      - 'version.txt'
+
+jobs:
+  dummyJob:
+    name: Dummy placeholder job for tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo infos
+        run: echo '${{toJSON(github)}}'
+      - run: echo "Doing tests here"
+      - run: echo "trigger test automation here"
+      - run: echo "build packages here"

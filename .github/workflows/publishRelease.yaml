@@ -1,0 +1,15 @@
+name: Triggered by Version Bump merged
+
+on:
+  push:
+    paths:
+      - '!**'
+      - version.txt
+
+jobs:
+  infos:
+    name: infos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo infos
+        run: echo '${{toJSON(github)}}'

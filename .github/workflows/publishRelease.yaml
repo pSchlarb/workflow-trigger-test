@@ -2,10 +2,12 @@ name: Triggered by Version Bump merged
 
 on:
   push:
+
+    paths:
+      - '!**'
+      - 'version.txt'
     tags-ignore:
       - '**'
-    paths:
-      - 'version.txt'
 
 jobs:
   infos:

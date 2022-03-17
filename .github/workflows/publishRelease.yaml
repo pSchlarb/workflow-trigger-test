@@ -3,8 +3,7 @@ name: Triggered by Version Bump merged
 on:
   push:
     paths:
-      - '!**'
-      - version.txt
+      - 'version.txt'
 
 jobs:
   infos:

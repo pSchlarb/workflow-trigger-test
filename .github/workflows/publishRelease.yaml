@@ -3,6 +3,8 @@ name: Triggered by Version Bump merged
 #disable all tags and enable all brannches and only version file
 on:
   push:
+    branches-ignore:
+      - update-rc-version
     paths:
       - version.txt
 
@@ -11,6 +13,23 @@ jobs:
   infos:
     name: infos
     runs-on: ubuntu-latest
+    outputs:
+      isVersionBump: ${{ steps.checkRelease.outputs.isVersionBump }}
     steps:
       - name: Echo infos
         run: echo '${{toJSON(github)}}'
+
+      - name: Extract needed infos
+        id: checkRelease
+        run: |
+          if [[ $(grep -oP "\[v\d+.\d+.\d+rc\d+\]" <<< "${{github.event.head_commit.message}}") ||   $(grep -oP "\[v\d+.\d+.\d+\]" <<< "${{github.event.head_commit.message}}") ]]; then
+            echo ::set-output\ name=isVersionBump::true
+
+  createRelease:
+    name: Create Release
+    needs: infos
+    if: needs.infos.outputs.isVersionBump == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder Release
+        run: echo "Create Release here"

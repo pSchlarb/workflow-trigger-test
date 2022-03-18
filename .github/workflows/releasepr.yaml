@@ -7,12 +7,28 @@ on:
       - version.txt
 
 jobs:
-  dummyJob:
-    name: Dummy placeholder job for tests
+  infos:
+    name: infos
     runs-on: ubuntu-latest
+    outputs:
+      isVersionBump: ${{ steps.checkRelease.outputs.isVersionBump }}
     steps:
       - name: Echo infos
         run: echo '${{toJSON(github)}}'
+
+      - name: Extract needed infos
+        id: checkRelease
+        run: |
+          echo "${{github.event.pull_request.body}}" > temp.txt
+          if [[ $(grep -oP "\[v\d+.\d+.\d+rc\d+\]" temp.txt) ||   $(grep -oP "\[v\d+.\d+.\d+\]" temp.txt) ]]; then
+            echo ::set-output\ name=isVersionBump::true
+
+  dummyJob:
+    name: Dummy placeholder job for tests
+    runs-on: ubuntu-latest
+    needs: infos
+    if: needs.infos.outputs.isVersionBump == true
+    steps:
       - run: echo "Doing tests here"
       - run: echo "trigger test automation here"
       - run: echo "build packages here"

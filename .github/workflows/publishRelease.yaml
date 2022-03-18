@@ -22,7 +22,8 @@ jobs:
       - name: Extract needed infos
         id: checkRelease
         run: |
-          if [[ $(grep -oP "\[v\d+.\d+.\d+rc\d+\]" <<< "${{github.event.head_commit.message}}") ||   $(grep -oP "\[v\d+.\d+.\d+\]" <<< "${{github.event.head_commit.message}}") ]]; then
+          echo "${{github.event.head_commit.message}}" > temp.txt
+          if [[ $(grep -oP "\[v\d+.\d+.\d+rc\d+\]" temp.txt) ||   $(grep -oP "\[v\d+.\d+.\d+\]" temp.txt) ]]; then
             echo ::set-output\ name=isVersionBump::true
 
   createRelease:

@@ -19,15 +19,17 @@ jobs:
       - name: Extract needed infos
         id: checkRelease
         run: |
-          echo "${{github.event.pull_request.body}}" > temp.txt
+          printf "${{github.event.pull_request.body}}" > temp.txt
+         
           if [[ $(grep -oP "\[v\d+.\d+.\d+rc\d+\]" temp.txt) ||   $(grep -oP "\[v\d+.\d+.\d+\]" temp.txt) ]]; then
             echo ::set-output\ name=isVersionBump::true
+          fi
 
   dummyJob:
     name: Dummy placeholder job for tests
     runs-on: ubuntu-latest
     needs: infos
-    if: needs.infos.outputs.isVersionBump == true
+    if: needs.infos.outputs.isVersionBump == 'true'
     steps:
       - run: echo "Doing tests here"
       - run: echo "trigger test automation here"

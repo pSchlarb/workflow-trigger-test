@@ -5,9 +5,9 @@ on:
   push:
     branches-ignore:
       - update-rc-version
+      - update-version
     paths:
       - version.txt
-
 
 jobs:
   infos:
@@ -22,14 +22,16 @@ jobs:
       - name: Extract needed infos
         id: checkRelease
         run: |
-          echo "${{github.event.head_commit.message}}" > temp.txt
+          printf "${{github.event.head_commit.message}}" > temp.txt
+
           if [[ $(grep -oP "\[v\d+.\d+.\d+rc\d+\]" temp.txt) ||   $(grep -oP "\[v\d+.\d+.\d+\]" temp.txt) ]]; then
             echo ::set-output\ name=isVersionBump::true
+          fi
 
   createRelease:
     name: Create Release
     needs: infos
-    if: needs.infos.outputs.isVersionBump == true
+    if: needs.infos.outputs.isVersionBump == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Placeholder Release

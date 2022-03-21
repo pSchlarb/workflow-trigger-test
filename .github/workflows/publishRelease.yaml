@@ -1,0 +1,16 @@
+name: Triggered by Version Bump merged
+
+#disable all tags and enable all brannches and only version file
+on:
+  push:
+    paths:
+      - version.txt
+
+
+jobs:
+  infos:
+    name: infos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo infos
+        run: echo '${{toJSON(github)}}'

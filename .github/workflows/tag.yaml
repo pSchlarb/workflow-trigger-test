@@ -28,6 +28,17 @@ jobs:
           echo ::set-output\ name=BASE::$branch
           echo "::debug::BASE is being set to $branch"
 
+      - name: get-release-version
+        id: get-release-version
+        uses: ./.github/actions/get-release-version
+        with:
+          versionString: ${{ github.ref }}
+
+      - name: print-version-info
+        run: |
+          echo "Version: ${{ steps.get-release-version.outputs.version }}"
+          echo "isRC: ${{ steps.get-release-version.outputs.isRC }}"
+
       - name: extract version
         id: version
         run: |

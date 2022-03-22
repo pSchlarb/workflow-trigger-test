@@ -48,11 +48,11 @@ runs:
           else
             isVersionBump=false
           fi
-        fi
 
-        # Set Outputs ...
-        echo "::set-output name=version::${version}"
-        echo "::set-output name=versionTag::${versionTag}"
-        echo "::set-output name=isRC::${isRC}"
-        echo "::set-output name=prBranch::${prBranch}"
-        echo "::set-output name=isVersionBump::${isVersionBump}"
+          # Set Outputs ...
+          echo "::set-output name=version::${version}"
+          echo "::set-output name=versionTag::${versionTag}"
+          echo "::set-output name=isRC::${isRC}"
+          echo "::set-output name=prBranch::${prBranch}"
+          echo "::set-output name=isVersionBump::${isVersionBump}"
+        fi

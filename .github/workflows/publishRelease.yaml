@@ -14,44 +14,35 @@ jobs:
     name: infos
     runs-on: ubuntu-latest
     outputs:
-      isVersionBump: ${{ steps.extractInfos.outputs.isVersionBump }}
-      isPreRelease: ${{ steps.extractInfos.outputs.isPreRelease }}
-      VERSIONTAG: ${{ steps.extractInfos.outputs.VERSIONTAG }}
+      isVersionBump: ${{ steps.get-release-info.outputs.isVersionBump }}
+      isPreRelease: ${{ steps.get-release-info.outputs.isRC }}
+      versionTag: ${{ steps.get-release-info.outputs.versionTag }}
     steps:
       - name: Echo infos
         run: echo '${{toJSON(github)}}'
 
-      - name: Extract needed infos
-        id: extractInfos
-        run: |
-          printf "${{github.event.head_commit.message}}" > temp.txt
+      - name: Checkout
+        uses: actions/checkout@v2
 
-          if [[ $(grep -oP "\[v\d+.\d+.\d+rc\d+\]" temp.txt) ||   $(grep -oP "\[v\d+.\d+.\d+\]" temp.txt) ]]; then
-            echo ::set-output\ name=isVersionBump::true
-            
-            if [[ $(grep -oP "\[v\d+.\d+.\d+rc\d+\]" temp.txt) ]] ; then
-              echo ::set-output\ name=isPreRelease::true
-              versionTag=$(grep -oP "v\d+.\d+.\d+rc\d+" temp.txt)
-            else
-              echo ::set-output\ name=isPreRelease::false
-              versionTag=$(grep -oP "v\d+.\d+.\d+" temp.txt)
-            fi
-            echo ::set-output\ name=VERSIONTAG::$versionTag
-          fi
+      - name: get-release-info
+        id: get-release-info
+        uses: ./.github/actions/get-release-info
+        with:
+          versionString: ${{ github.event.head_commit.message }}
 
   dummytest:
     name: Dummy Job for Tests
     runs-on: ubuntu-latest
     needs: infos
     steps:
-      - run: echo "Doing tests here"   
+      - run: echo "Doing tests here"
 
   dummybuild:
     name: Dummy Job for Packaging
     needs: dummytest
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Doing BuildPackages here"   
+      - run: echo "Doing BuildPackages here"
 
   createRelease:
     name: Create Release
@@ -60,18 +51,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: v3
 
       - name: PreRelease
         uses: softprops/action-gh-release@v1
         if: needs.infos.outputs.isPreRelease == 'true'
         with:
-          tag_name: ${{ needs.infos.outputs.VERSIONTAG }}
+          tag_name: ${{ needs.infos.outputs.versionTag }}
           prerelease: true
           generate_release_notes: true
-          body: "Custom Body Text that will be prepended to the automatically generated one [${{ needs.infos.outputs.VERSIONTAG }}] "
+          body: "Custom Body Text that will be prepended to the automatically generated one [${{ needs.infos.outputs.versionTag }}] "
           target_commitish: ${{github.event.ref}}
-          name: "PreRelease for [${{ needs.infos.outputs.VERSIONTAG }}]"
+          name: "PreRelease for [${{ needs.infos.outputs.versionTag }}]"
           # note you'll typically need to create a personal access token
           # with permissions to create releases in the other repo
           token: ${{ secrets.NEOBOT_PR_PAT }}
@@ -80,12 +71,12 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: needs.infos.outputs.isPreRelease == 'false'
         with:
-          tag_name: ${{ needs.infos.outputs.VERSIONTAG }}
+          tag_name: ${{ needs.infos.outputs.versionTag }}
           prerelease: false
           generate_release_notes: true
-          body: "Custom Body Text that will be prepended to the automatically generated one [${{ needs.infos.outputs.VERSIONTAG }}] "
+          body: "Custom Body Text that will be prepended to the automatically generated one [${{ needs.infos.outputs.versionTag }}] "
           target_commitish: ${{github.event.ref}}
-          name: "Release for [${{ needs.infos.outputs.VERSIONTAG }}]"
+          name: "Release for [${{ needs.infos.outputs.versionTag }}]"
           # note you'll typically need to create a personal access token
           # with permissions to create releases in the other repo
           token: ${{ secrets.NEOBOT_PR_PAT }}

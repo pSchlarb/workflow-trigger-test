@@ -53,30 +53,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: PreRelease
-        uses: softprops/action-gh-release@v1
-        if: needs.infos.outputs.isPreRelease == 'true'
-        with:
-          tag_name: ${{ needs.infos.outputs.versionTag }}
-          prerelease: true
-          generate_release_notes: true
-          body: "Custom Body Text that will be prepended to the automatically generated one [${{ needs.infos.outputs.versionTag }}] "
-          target_commitish: ${{github.event.ref}}
-          name: "PreRelease for [${{ needs.infos.outputs.versionTag }}]"
-          # note you'll typically need to create a personal access token
-          # with permissions to create releases in the other repo
-          token: ${{ secrets.NEOBOT_PR_PAT }}
-
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: needs.infos.outputs.isPreRelease == 'false'
         with:
           tag_name: ${{ needs.infos.outputs.versionTag }}
-          prerelease: false
+          prerelease: ${{ needs.infos.outputs.isPreRelease }}
           generate_release_notes: true
-          body: "Custom Body Text that will be prepended to the automatically generated one [${{ needs.infos.outputs.versionTag }}] "
           target_commitish: ${{github.event.ref}}
-          name: "Release for [${{ needs.infos.outputs.versionTag }}]"
+          name: "${{ needs.infos.outputs.versionTag }}"
           # note you'll typically need to create a personal access token
           # with permissions to create releases in the other repo
           token: ${{ secrets.NEOBOT_PR_PAT }}

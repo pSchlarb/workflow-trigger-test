@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get-release-info.outputs.version }}
+      versionTag: ${{ steps.get-release-info.outputs.versionTag }}
       prBranch: ${{ steps.get-release-info.outputs.prBranch }}
       BASE: ${{ steps.branch.outputs.BASE}}
     steps:
@@ -55,7 +56,7 @@ jobs:
           commit-message: Update Version number for v${{ needs.taginfos.outputs.version }}
           base: ${{ needs.taginfos.outputs.BASE }}
           branch: ${{ needs.taginfos.outputs.prBranch }}
-          title: "[v${{ needs.taginfos.outputs.version }}] - Update Version Number for Release"
-          body: "[v${{ needs.taginfos.outputs.version }}] - Update Version number for Release"
+          title: "[${{ needs.taginfos.outputs.versionTag }}] - Update Version Number for Release"
+          body: "[${{ needs.taginfos.outputs.versionTag }}] - Update Version number for Release"
           delete-branch: true
           token: ${{ secrets.NEOBOT_PR_PAT }}

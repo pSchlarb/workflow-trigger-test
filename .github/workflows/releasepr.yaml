@@ -11,19 +11,16 @@ jobs:
     name: infos
     runs-on: ubuntu-latest
     outputs:
-      isVersionBump: ${{ steps.checkRelease.outputs.isVersionBump }}
+      isVersionBump: ${{ steps.get-release-info.outputs.isVersionBump }}
     steps:
       - name: Echo infos
         run: echo '${{toJSON(github)}}'
 
-      - name: Extract needed infos
-        id: checkRelease
-        run: |
-          printf "${{github.event.pull_request.body}}" > temp.txt
-         
-          if [[ $(grep -oP "\[v\d+.\d+.\d+rc\d+\]" temp.txt) ||   $(grep -oP "\[v\d+.\d+.\d+\]" temp.txt) ]]; then
-            echo ::set-output\ name=isVersionBump::true
-          fi
+      - name: get-release-info
+        id: get-release-info
+        uses: ./.github/actions/get-release-info
+        with:
+          versionString: ${{ github.event.pull_request.body }}
 
   dummyJob:
     name: Dummy placeholder job for tests

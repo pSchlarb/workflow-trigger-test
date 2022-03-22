@@ -70,7 +70,7 @@ jobs:
           prerelease: true
           generate_release_notes: true
           body: "Custom Body Text that will be prepended to the automatically generated one [${{ needs.infos.outputs.VERSIONTAG }}] "
-          target_commitish: ${{env.GITHUB_REF_NAME}}
+          target_commitish: ${{github.event.ref}}
           name: "PreRelease for [${{ needs.infos.outputs.VERSIONTAG }}]"
           # note you'll typically need to create a personal access token
           # with permissions to create releases in the other repo
@@ -84,7 +84,7 @@ jobs:
           prerelease: false
           generate_release_notes: true
           body: "Custom Body Text that will be prepended to the automatically generated one [${{ needs.infos.outputs.VERSIONTAG }}] "
-          target_commitish: ${{env.GITHUB_REF_NAME}}
+          target_commitish: ${{github.event.ref}}
           name: "Release for [${{ needs.infos.outputs.VERSIONTAG }}]"
           # note you'll typically need to create a personal access token
           # with permissions to create releases in the other repo

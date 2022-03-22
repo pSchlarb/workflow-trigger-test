@@ -1,0 +1,30 @@
+name: "Get Release Version"
+description: "Gets the release version and meta data from a string containing a verison number in the form <Major>.<Minor>.<Patch>[[-]rc<Num>]."
+
+inputs:
+  versionString: 
+    description: "A string containing a version number in the form <Major>.<Minor>.<Patch>[[-]rc<Num>]."
+    required: true
+    default: ""
+
+outputs:
+  version:
+    description: "The version number extracted from the string."
+    value: ${{ steps.version.outputs.version }}
+  isRC:
+    description: "A flag indicating whether or not the version is an RC version."
+    value: ${{ steps.versions.outputs.isRC }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get Release Version
+      id: version
+      shell: bash
+      run: |
+        version=$(grep -oP "\d+.\d+.\d+(-?rc\d+)?" <<< "${{ inputs.versionString }}")
+        isRC=${{ contains(version, 'rc') }}
+
+        # Set Outputs ...
+        echo "::set-output name=version::${version}"
+        echo "::set-output name=isRC::${isRC}"

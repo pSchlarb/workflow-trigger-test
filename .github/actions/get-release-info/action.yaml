@@ -32,14 +32,21 @@ runs:
       shell: bash
       run: |
         # Defaults
+        echo "Setting defaults ..."
         version=""
         versionTag=""
         isRC=""
         prBranch=""
         isVersionBump=""
 
+        echo "Parsing version ..."
         version=$(grep -oP "\d+.\d+.\d+(-?rc\d+)?" <<< "${{ inputs.versionString }}")
+        echo "Version: ${version}"
+        
         if [[ ! -z ${version}  ]]; then
+
+          echo "Version Set ..."
+
           versionTag="v${version}"
           if [[ "${version}" == *'rc'* ]]; then
             isRC=true
@@ -58,6 +65,14 @@ runs:
         fi
 
         # Set Outputs ...
+        
+        echo "Setting outputs ..."
+        echo "version: ${version}"
+        echo "versionTag: ${versionTag}"
+        echo "isRC: ${isRC}"
+        echo "prBranch: ${prBranch}"
+        echo "isVersionBump: ${isVersionBump}"
+
         echo "::set-output name=version::${version}"
         echo "::set-output name=versionTag::${versionTag}"
         echo "::set-output name=isRC::${isRC}"

@@ -53,11 +53,14 @@ jobs:
         if: contains(needs.taginfos.outputs.VERSION, 'rc')
         uses: peter-evans/create-pull-request@v3
         with:
+          author: ${{ github.actor }} <${{ github.event.pusher.email }}>
+          committer: ${{ github.actor }} <${{ github.event.pusher.email }}>
           commit-message: Update Version number for Prerelease
           signoff: true
           title: Update Version number for RC[v${{ needs.taginfos.outputs.VERSION }}]
           body: Update Version number for RC[v${{ needs.taginfos.outputs.VERSION }}]
           branch: update-rc-version
+          delete-branch: true
           base: ${{ needs.taginfos.outputs.BASE }}
           token: ${{ secrets.NEOBOT_PR_PAT }}
     
@@ -65,11 +68,14 @@ jobs:
         if:  ${{!contains(needs.taginfos.outputs.VERSION, 'rc')}}
         uses: peter-evans/create-pull-request@v3
         with:
+          author: ${{ github.actor }} <${{ github.event.pusher.email }}>
+          committer: ${{ github.actor }} <${{ github.event.pusher.email }}>
           commit-message: Update Version number for Release
           signoff: true
           title: Update Version number for [v${{ needs.taginfos.outputs.VERSION }}]
           body: Update Version number for [v${{ needs.taginfos.outputs.VERSION }}]
           branch: update-version
+          delete-branch: true
           base: ${{ needs.taginfos.outputs.BASE }}
           token: ${{ secrets.NEOBOT_PR_PAT }}
     

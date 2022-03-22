@@ -10,9 +10,9 @@ jobs:
     name: Print github context infos to get Tag infos
     runs-on: ubuntu-latest
     outputs:
-      VERSION: ${{ steps.get-release-info.outputs.version }}
+      version: ${{ steps.get-release-info.outputs.version }}
       prBranch: ${{ steps.get-release-info.outputs.prBranch }}
-      BASE: ${{ steps.branch.outputs.BASE}}
+      base: ${{ steps.branch.outputs.base}}
     steps:
       - name: Echo infos
         run: echo '${{toJSON(github)}}'
@@ -25,8 +25,8 @@ jobs:
         run: |
           raw=$(git branch -r --contains ${{ github.ref }})
           branch=${raw/origin\/}
-          echo ::set-output\ name=BASE::$branch
-          echo "::debug::BASE is being set to $branch"
+          echo ::set-output\ name=base::$branch
+          echo "::debug::base is being set to $branch"
 
       - name: get-release-info
         id: get-release-info
@@ -44,7 +44,7 @@ jobs:
 
       - name: Prepare package and set version
         run: |
-          echo ${{ needs.taginfos.outputs.VERSION }} > version.txt
+          echo ${{ needs.taginfos.outputs.version }} > version.txt
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
@@ -52,10 +52,10 @@ jobs:
           author: ${{ github.actor }} <${{ github.event.pusher.email }}>
           committer: ${{ github.actor }} <${{ github.event.pusher.email }}>
           signoff: true
-          commit-message: Update Version number for v${{ needs.taginfos.outputs.VERSION }}
-          base: ${{ needs.taginfos.outputs.BASE }}
+          commit-message: Update Version number for v${{ needs.taginfos.outputs.version }}
+          base: ${{ needs.taginfos.outputs.base }}
           branch: ${{ needs.taginfos.outputs.prBranch }}
-          title: "[v${{ needs.taginfos.outputs.VERSION }}] - Update Version Number for Release"
-          body: "[v${{ needs.taginfos.outputs.VERSION }}] - Update Version number for Release"
+          title: "[v${{ needs.taginfos.outputs.version }}] - Update Version Number for Release"
+          body: "[v${{ needs.taginfos.outputs.version }}] - Update Version number for Release"
           delete-branch: true
           token: ${{ secrets.NEOBOT_PR_PAT }}

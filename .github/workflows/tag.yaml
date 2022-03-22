@@ -2,7 +2,7 @@ name: Triggered by set Tag
 
 on:
   push:
-    tags:        
+    tags:
       - setRelease-v**
 
 jobs:
@@ -11,30 +11,39 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.version.outputs.VERSION }}
+      prBranch: ${{ steps.version.outputs.prBranch }}
       BASE: ${{ steps.branch.outputs.BASE}}
     steps:
       - name: Echo infos
         run: echo '${{toJSON(github)}}'
+
       - name: checkout source code
         uses: actions/checkout@v1
-      - name: extract branch 
+
+      - name: extract branch
         id: branch
         run: |
           raw=$(git branch -r --contains ${{ github.ref }})
           branch=${raw/origin\/}
           echo ::set-output\ name=BASE::$branch
           echo "::debug::BASE is being set to $branch"
-      - name: extract version 
+
+      - name: extract version
         id: version
         run: |
           if [[ $(grep -oP "\d+.\d+.\d+rc\d+" <<< "${{github.ref}}") ]]; then
             version=$(grep -oP "\d+.\d+.\d+rc\d+" <<< "${{github.ref}}")
+            prBranch="update-rc-version"
           elif [[ $(grep -oP "\d+.\d+.\d+" <<< "${{github.ref}}") ]];then
             version=$(grep -oP "\d+.\d+.\d+" <<< "${{github.ref}}")
+            prBranch="update-version"
           fi
-          
+
           echo ::set-output\ name=VERSION::$version
           echo '::debug::VERSION is being set to $version'
+
+          echo ::set-output\ name=prBranch::$prBranch
+          echo '::debug::prBranch is being set to $prBranch'
 
 
   bump_version:
@@ -50,32 +59,15 @@ jobs:
           echo ${{ needs.taginfos.outputs.VERSION }} > version.txt
 
       - name: Create Pull Request
-        if: contains(needs.taginfos.outputs.VERSION, 'rc')
         uses: peter-evans/create-pull-request@v3
         with:
           author: ${{ github.actor }} <${{ github.event.pusher.email }}>
           committer: ${{ github.actor }} <${{ github.event.pusher.email }}>
-          commit-message: Update Version number for Prerelease
           signoff: true
-          title: Update Version number for RC[v${{ needs.taginfos.outputs.VERSION }}]
-          body: Update Version number for RC[v${{ needs.taginfos.outputs.VERSION }}]
-          branch: update-rc-version
-          delete-branch: true
+          commit-message: Update Version number for v${{ needs.taginfos.outputs.VERSION }}
           base: ${{ needs.taginfos.outputs.BASE }}
-          token: ${{ secrets.NEOBOT_PR_PAT }}
-    
-      - name: Create Pull Request
-        if:  ${{!contains(needs.taginfos.outputs.VERSION, 'rc')}}
-        uses: peter-evans/create-pull-request@v3
-        with:
-          author: ${{ github.actor }} <${{ github.event.pusher.email }}>
-          committer: ${{ github.actor }} <${{ github.event.pusher.email }}>
-          commit-message: Update Version number for Release
-          signoff: true
-          title: Update Version number for [v${{ needs.taginfos.outputs.VERSION }}]
-          body: Update Version number for [v${{ needs.taginfos.outputs.VERSION }}]
-          branch: update-version
+          branch: ${{ needs.taginfos.outputs.prBranch }}
+          title: "[v${{ needs.taginfos.outputs.VERSION }}] - Update Version Number for Release"
+          body: "[v${{ needs.taginfos.outputs.VERSION }}] - Update Version number for Release"
           delete-branch: true
-          base: ${{ needs.taginfos.outputs.BASE }}
           token: ${{ secrets.NEOBOT_PR_PAT }}
-    

@@ -28,7 +28,7 @@ jobs:
         id: get-release-info
         uses: ./.github/actions/get-release-info
         with:
-          versionString: ${{ github.event.head_commit.message }}
+          versionString: "${{ github.event.head_commit.message }}"
 
   dummytest:
     name: Dummy Job for Tests

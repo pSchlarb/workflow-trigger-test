@@ -1,0 +1,83 @@
+name: Triggered by set Tag
+
+on:
+  push:
+    tags:
+      - test-v**
+
+jobs:
+  taginfos:
+    name: Print github context infos to get Tag infos
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-release-info.outputs.version }}
+      versionTag: ${{ steps.get-release-info.outputs.versionTag }}
+      prBranch: ${{ steps.get-release-info.outputs.prBranch }}
+      BASE: ${{ steps.branch.outputs.BASE}}
+    steps:
+      - name: Echo infos
+        run: echo '${{toJSON(github)}}'
+
+      - name: checkout source code
+        uses: actions/checkout@v1
+
+      - name: extract branch
+        id: branch
+        run: |
+          raw=$(git branch -r --contains ${{ github.ref }})
+          branch=${raw/origin\/}
+          echo ::set-output\ name=BASE::$branch
+          echo "::debug::BASE is being set to $branch"
+
+      - name: get-release-info
+        id: get-release-info
+        env:
+          versionString: ${{ github.ref }}
+        run: |
+          # Defaults
+          echo "Setting defaults ..."
+          version=""
+          versionTag=""
+          isRC=""
+          prBranch=""
+          isVersionBump=""
+
+          echo "Parsing version ..."
+          version=$(grep -oP "\d+.\d+.\d+(-?rc\d+)?" <<< "${{ env.versionString }}")
+          echo "Version: ${version}"
+          
+          if [[ ! -z ${version}  ]]; then
+
+            echo "Version Set ..."
+
+            versionTag="v${version}"
+            if [[ "${version}" == *'rc'* ]]; then
+              isRC=true
+              prBranch=update-rc-version
+            else
+              isRC=false
+              prBranch=update-version
+            fi
+
+            # Check to see if the version number is an indication of a version bump.
+            if [[ $(grep -oP "\[v\d+.\d+.\d+(-?rc\d+)?\]" <<< "${{ env.versionString }}") ]]; then
+              isVersionBump=true
+            else
+              isVersionBump=false
+            fi
+          fi
+
+          # Set Outputs ...
+          
+          echo "Setting outputs ..."
+          echo "version: ${version}"
+          echo "versionTag: ${versionTag}"
+          echo "isRC: ${isRC}"
+          echo "prBranch: ${prBranch}"
+          echo "isVersionBump: ${isVersionBump}"
+
+          echo "::set-output name=version::${version}"
+          echo "::set-output name=versionTag::${versionTag}"
+          echo "::set-output name=isRC::${isRC}"
+          echo "::set-output name=prBranch::${prBranch}"
+          echo "::set-output name=isVersionBump::${isVersionBump}"

@@ -23,7 +23,7 @@ jobs:
         id: get-release-info
         uses: ./.github/actions/get-release-info
         with:
-          versionString: ${{ github.event.pull_request.body }}
+          versionString: "${{ github.event.pull_request.body }}"
 
   dummyJob:
     name: Dummy placeholder job for tests

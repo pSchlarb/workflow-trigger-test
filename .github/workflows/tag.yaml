@@ -33,7 +33,7 @@ jobs:
         id: get-release-info
         uses: ./.github/actions/get-release-info
         with:
-          versionString: ${{ github.ref }}
+          versionString: "${{ github.ref }}"
 
   bump_version:
     name: Bump Version Number

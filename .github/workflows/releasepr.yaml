@@ -21,7 +21,7 @@ jobs:
 
       - name: get-release-info
         id: get-release-info
-        uses: ./.github/actions/get-release-info
+        uses: WadeBarnes/workflow-trigger-test/.github/actions/get-release-info@v1.3.0rc3
         with:
           versionString: "${{ github.event.pull_request.body }}"
 

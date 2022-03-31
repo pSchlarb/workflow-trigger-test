@@ -1,0 +1,20 @@
+name: test-matrix
+on:
+  workflow_dispatch:
+jobs:
+  test-matrix:
+    name: Test Matrix
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        include:
+        - mobile-platform: "-p iOS"
+          app-file-name: "-a AriesBifold-${{ github.run_number }}.ipa"
+        - mobile-platform: "-p Android"
+          app-file-name: "-a AriesBifold-${{ github.run_number }}.aab"
+    steps:
+      - name: Echo site details
+        run: |
+          echo "mobile-platform: ${{ matrix.mobile-platform }}"
+          echo "app-file-name: ${{ matrix.app-file-name }}"

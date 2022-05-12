@@ -14,6 +14,7 @@ jobs:
       versionTag: ${{ steps.get-release-info.outputs.versionTag }}
       prBranch: ${{ steps.get-release-info.outputs.prBranch }}
       BASE: ${{ steps.branch.outputs.BASE}}
+      publish: $ {{steps.checkPublish.outputs.publish}}
     steps:
       - name: Echo infos
         run: echo '${{toJSON(github)}}'
@@ -34,6 +35,22 @@ jobs:
         uses: ./.github/actions/get-release-info
         with:
           versionString: "${{ github.ref }}"
+
+      - name: check Publish
+        id: checkPublish
+        run: |
+          [ "${{github.repository_owner}}" = "WadeBarnes" ] && echo ::set-output\ name=publish::true || echo ::set-output\ name=publish::false
+      - name: double check
+        run: echo ${{steps.checkPublish.outputs.publish}}
+
+  test:
+    name: test
+    needs: [taginfos]
+    if: needs.taginfos.outputs.publish == 'true'
+    runs-on: ubuntu-20.04
+    steps:
+        - name: test
+          run: echo "worked"
 
   bump_version:
     name: Bump Version Number

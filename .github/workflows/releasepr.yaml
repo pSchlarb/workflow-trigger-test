@@ -34,3 +34,9 @@ jobs:
       - run: echo "Doing tests here"
       - run: echo "trigger test automation here"
       - run: echo "build packages here"
+
+  status_Check:
+    runs-on: ubuntu-latest
+    needs: dummyJob
+    steps:
+      - run: echo "Status Check passed"

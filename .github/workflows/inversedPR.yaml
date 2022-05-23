@@ -7,8 +7,11 @@ on:
       - version.txt
 
 jobs:
-
   status_Check:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Status Check passed"
+      - uses: LouisBrunner/checks-action@v1.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Test XYZ
+          conclusion: success

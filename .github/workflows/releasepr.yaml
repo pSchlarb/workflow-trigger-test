@@ -2,9 +2,7 @@ name: Triggered by Version Bump Release PR
 
 on:
   pull_request:
-    paths:
-      - '!**'
-      - version.txt
+
 
 jobs:
   infos:
@@ -25,12 +23,6 @@ jobs:
         with:
           versionString: "${{ github.event.pull_request.body }}"
 
-      - uses: LouisBrunner/checks-action@v1.1.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: Test XYZ
-          status: in_progress
-
   dummyJob:
     name: Dummy placeholder job for tests
     runs-on: ubuntu-latest
@@ -43,9 +35,14 @@ jobs:
   status_Check:
     runs-on: ubuntu-latest
     needs: dummyJob
+    name: statusCheck
+    if: "false"
     steps:
-      - uses: LouisBrunner/checks-action@v1.1.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: Test XYZ
-          conclusion: success
+      - run: 'echo "Just a status Check (Always true) for branch protection rules" '
+  status_Check2:
+    runs-on: ubuntu-latest
+    needs: dummyJob
+    name: statusCheck
+    if: "true"
+    steps:
+      - run: 'echo "Just a status Check (Always true) for branch protection rules" '
